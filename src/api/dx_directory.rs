@@ -2,6 +2,8 @@
 
 use anyhow::Result;
 use std::path::PathBuf;
+use std::fs;
+use serde_json::json;
 
 pub fn get_dx_directory_path() -> Result<PathBuf> {
     let root = crate::api::cicd::detect_workspace_root()?;
@@ -28,6 +30,25 @@ pub fn load_tool_offline_binary(tool_name: &str) -> Result<Vec<u8>> {
 pub fn commit_current_dx_state(message: &str) -> Result<String> {
     tracing::info!("💾 Committing dx state: {}", message);
     let commit_id = uuid::Uuid::new_v4().to_string();
+    
+    let dx_dir = get_dx_directory_path()?;
+    let state_dir = dx_dir.join("state");
+    fs::create_dir_all(&state_dir)?;
+    
+    let timestamp = chrono::Utc::now().to_rfc3339();
+    
+    let state = json!({
+        "id": commit_id,
+        "message": message,
+        "timestamp": timestamp,
+        "tools": crate::core::Forge::new(crate::api::cicd::detect_workspace_root()?)?.list_tools(),
+    });
+    
+    let state_file = state_dir.join(format!("{}.json", commit_id));
+    fs::write(&state_file, serde_json::to_string_pretty(&state)?)?;
+    
+    tracing::info!("✅ State committed to {:?}", state_file);
+    
     Ok(commit_id)
 }
 

@@ -80,7 +80,38 @@ pub fn execute_pipeline(pipeline_name: &str) -> Result<()> {
     tracing::info!("🎼 Executing pipeline: {}", pipeline_name);
     state.active_pipeline = Some(pipeline_name.to_string());
     
-    // TODO: Load pipeline configuration and execute tools
+    // Get global forge instance
+    let forge = unsafe {
+        if let Some(forge) = crate::api::lifecycle::FORGE_INSTANCE.as_ref() {
+            forge.clone()
+        } else {
+            anyhow::bail!("Forge not initialized");
+        }
+    };
+
+    // Execute tools via orchestrator
+    let orchestrator = forge.read().orchestrator();
+    let mut orchestrator = orchestrator.write();
+    
+    // TODO: Filter tools based on pipeline name
+    // For now, we execute all tools for the "default" pipeline
+    if pipeline_name == "default" {
+        let results = orchestrator.execute_all()?;
+        
+        // Update state with execution order
+        state.execution_order = results.iter()
+            .map(|o| "tool-id-placeholder".to_string()) // TODO: Get tool ID from output
+            .collect();
+            
+        // Check for failures
+        let failures: Vec<_> = results.iter().filter(|o| !o.success).collect();
+        if !failures.is_empty() {
+            anyhow::bail!("Pipeline execution failed: {} tools failed", failures.len());
+        }
+    } else {
+        tracing::warn!("Pipeline '{}' not yet implemented, running default", pipeline_name);
+        let _ = orchestrator.execute_all()?;
+    }
     
     Ok(())
 }

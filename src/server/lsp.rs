@@ -9,6 +9,7 @@ use tokio::sync::RwLock;
 use tracing::info;
 
 use crate::patterns::PatternDetector;
+use crate::api::reactivity::trigger_realtime_event;
 
 /// LSP Server state
 pub struct LspServer {
@@ -48,7 +49,14 @@ impl LspServer {
     /// Handle document change
     pub async fn did_change(&self, uri: String, text: String) -> Result<()> {
         info!("✏️  Document changed: {}", uri);
-        self.documents.write().await.insert(uri, text);
+        self.documents.write().await.insert(uri.clone(), text.clone());
+        
+        // Trigger realtime event in Forge
+        let path = std::path::PathBuf::from(uri.trim_start_matches("file://"));
+        if let Err(e) = trigger_realtime_event(path, text) {
+            tracing::error!("Failed to trigger realtime event: {}", e);
+        }
+        
         Ok(())
     }
 

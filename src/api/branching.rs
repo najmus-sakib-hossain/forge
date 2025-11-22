@@ -174,8 +174,18 @@ pub fn automatically_accept_green_conflicts(changes: Vec<FileChange>) -> Result<
 pub fn prompt_review_for_yellow_conflicts(changes: Vec<FileChange>) -> Result<()> {
     tracing::info!("🟡 Prompting review for {} yellow changes", changes.len());
     
-    // TODO: Open LSP review UI
-    // This would integrate with the editor to show inline diffs
+    for change in &changes {
+        println!("⚠️  CONFLICT: Review required for {:?}", change.path);
+    }
+
+    // Emit event for LSP
+    crate::api::events::publish_event(crate::api::events::ForgeEvent::Custom {
+        event_type: "conflict_review_required".to_string(),
+        data: serde_json::json!({
+            "changes": changes.iter().map(|c| c.path.to_string_lossy()).collect::<Vec<_>>()
+        }),
+        timestamp: chrono::Utc::now().timestamp(),
+    })?;
     
     Ok(())
 }
@@ -307,8 +317,16 @@ pub fn reset_branching_engine_state() -> Result<()> {
 
 // Helper function
 fn apply_file_change(change: &FileChange) -> Result<()> {
-    // TODO: Actually write file
     tracing::debug!("💾 Writing file: {:?}", change.path);
+    
+    // Ensure directory exists
+    if let Some(parent) = change.path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    
+    // Write content
+    std::fs::write(&change.path, &change.new_content)?;
+    
     Ok(())
 }
 

@@ -11,8 +11,8 @@ use crate::core::Forge;
 
 // Global forge instance
 static INIT: Once = Once::new();
-static mut FORGE_INSTANCE: Option<Arc<RwLock<Forge>>> = None;
-static mut TOOL_REGISTRY: Option<Arc<RwLock<HashMap<String, Arc<RwLock<Box<dyn DxTool>>>>>>> = None;
+pub(crate) static mut FORGE_INSTANCE: Option<Arc<RwLock<Forge>>> = None;
+pub(crate) static mut TOOL_REGISTRY: Option<Arc<RwLock<HashMap<String, Arc<RwLock<Box<dyn DxTool>>>>>>> = None;
 static mut CURRENT_CONTEXT: Option<Arc<RwLock<ExecutionContext>>> = None;
 
 /// Global one-time initialization (dx binary, LSP, editor extension, daemon)

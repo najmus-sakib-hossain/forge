@@ -33,8 +33,23 @@ fn get_reactivity_state() -> Arc<RwLock<ReactivityState>> {
 pub fn trigger_realtime_event(file: PathBuf, _content: String) -> Result<()> {
     tracing::debug!("⚡ Realtime event: {:?}", file);
     
-    // TODO: Queue for immediate execution
-    // This would trigger tools marked for realtime execution
+    // Update execution context with changed file
+    if let Some(forge) = unsafe { crate::api::lifecycle::FORGE_INSTANCE.as_ref() } {
+        let forge = forge.read();
+        let orchestrator = forge.orchestrator();
+        let mut orchestrator = orchestrator.write();
+        
+        // Add to changed files if not already present
+        if !orchestrator.context().changed_files.contains(&file) {
+            orchestrator.context_mut().changed_files.push(file.clone());
+        }
+        
+        // Execute realtime pipeline (if we had one, for now just log)
+        tracing::info!("⚡ Triggering realtime analysis for {:?}", file);
+        
+        // In a real production system, we might run a subset of fast tools here
+        // orchestrator.execute_subset(&["dx-lint", "dx-format"])?;
+    }
     
     Ok(())
 }

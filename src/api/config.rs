@@ -2,6 +2,20 @@
 
 use anyhow::Result;
 use std::path::PathBuf;
+use serde::Deserialize;
+use std::fs;
+
+#[derive(Debug, Deserialize)]
+pub struct DxConfig {
+    pub style: Option<toml::Value>,
+    pub auth: Option<toml::Value>,
+    pub ui: Option<toml::Value>,
+    pub icon: Option<toml::Value>,
+    pub font: Option<toml::Value>,
+    pub media: Option<toml::Value>,
+    #[serde(flatten)]
+    pub other: toml::Table,
+}
 
 pub fn get_active_config_file_path() -> Result<PathBuf> {
     let candidates = vec!["dx.toml", "dx.ts", "dx.json", "dx.js"];
@@ -18,6 +32,19 @@ pub fn get_active_config_file_path() -> Result<PathBuf> {
 
 pub fn reload_configuration_manifest() -> Result<()> {
     tracing::info!("🔄 Reloading configuration manifest");
+    
+    let config_path = get_active_config_file_path()?;
+    if config_path.exists() {
+        let content = fs::read_to_string(&config_path)?;
+        let config: DxConfig = toml::from_str(&content)?;
+        tracing::info!("✅ Loaded configuration from {:?}", config_path);
+        tracing::debug!("Config content: {:?}", config);
+        
+        // TODO: Update global configuration state
+    } else {
+        tracing::warn!("⚠️  Configuration file not found: {:?}", config_path);
+    }
+    
     Ok(())
 }
 

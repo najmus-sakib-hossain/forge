@@ -18,7 +18,7 @@ use super::editor_integration::EditorIntegration;
 /// Main Forge instance - provides unified API for DX tools
 pub struct Forge {
     config: ForgeConfig,
-    _orchestrator: Arc<RwLock<Orchestrator>>,
+    orchestrator: Arc<RwLock<Orchestrator>>,
     watcher: Option<Arc<RwLock<DualWatcher>>>,
     registry: Arc<RwLock<ToolRegistry>>,
     _injection_manager: Arc<RwLock<InjectionManager>>,
@@ -152,7 +152,7 @@ impl Forge {
         
         Ok(Self {
             config,
-            _orchestrator: orchestrator,
+            orchestrator,
             watcher,
             registry,
             _injection_manager: injection_manager,
@@ -165,6 +165,11 @@ impl Forge {
     /// Get the project root directory
     pub fn project_root(&self) -> &Path {
         &self.config.project_root
+    }
+
+    /// Get the orchestrator instance
+    pub fn orchestrator(&self) -> Arc<RwLock<Orchestrator>> {
+        self.orchestrator.clone()
     }
     
     /// Get the forge data directory
