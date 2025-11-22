@@ -1,0 +1,107 @@
+{
+  "name": "forge-lsp",
+  "displayName": "DX Forge LSP",
+  "description": "Real-time file change detection with AST visualization and beautiful output logging",
+  "version": "0.0.1",
+  "publisher": "dx-tools",
+  "repository": "https://github.com/najmus-sakib-hossain/forge",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.0.0",
+    "ws": "^8.16.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "forge.start",
+        "title": "Forge: Start Watching",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "forge.stop",
+        "title": "Forge: Stop Watching",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "forge.clearOutput",
+        "title": "Forge: Clear Output",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "forge.showAST",
+        "title": "Forge: Show Current File AST",
+        "icon": "$(symbol-structure)"
+      },
+      {
+        "command": "forge.showAllDxMetrics",
+        "title": "Forge: Show All DX Metrics",
+        "icon": "$(graph-line)"
+      },
+      {
+        "command": "forge.showDxMetricDetail",
+        "title": "Forge: Show DX Metric Detail",
+        "icon": "$(dashboard)"
+      },
+      {
+        "command": "forge.showTraffic",
+        "title": "Forge: Show Traffic Branch Status",
+        "icon": "$(git-branch)"
+      }
+    ],
+    "configuration": {
+      "title": "DX Forge LSP",
+      "properties": {
+        "forge.autoStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically start watching when opening a Forge repository"
+        },
+        "forge.showTimestamps": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show timestamps in operation logs"
+        },
+        "forge.showDuration": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show operation duration"
+        },
+        "forge.showDiffs": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show content diffs in output"
+        },
+        "forge.colorizeOutput": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use colors in output panel"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.x",
+    "@typescript-eslint/parser": "^6.x",
+    "eslint": "^8.x",
+    "typescript": "^5.3.0",
+    "@types/ws": "^8.5.10"
+  }
+}

@@ -1,0 +1,191 @@
+[package]
+name = "dx-forge"
+version = "0.1.3"
+edition = "2021"
+rust-version = "1.91.1"
+authors = ["Najmus Sakib Hossain <najmus.sakib.hossain@gmail.com>"]
+description = "Production-ready VCS and orchestration engine for DX tools with Git-like versioning, dual-watcher architecture, traffic branch system, and component injection"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/najmus-sakib-hossain/forge"
+documentation = "https://docs.rs/dx-forge"
+readme = "README.md"
+keywords = ["vcs", "orchestration", "lsp", "developer-tools", "dx"]
+categories = ["development-tools", "filesystem", "command-line-utilities"]
+include = [
+    "src/**",
+    "examples/**",
+    "tests/**",
+    "Cargo.toml",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "FORGE.md",
+    "orchestration.toml",
+    "CONTRIBUTING.md",
+    "docs/**",
+]
+
+[[bin]]
+name = "forge-cli"
+path = "src/bin/cli.rs"
+required-features = []
+
+[[bin]]
+name = "forge-lsp"
+path = "src/bin/lsp.rs"
+required-features = []
+
+[[example]]
+name = "complete_dx_workflow"
+path = "examples/complete_dx_workflow.rs"
+
+[[example]]
+name = "example_tools"
+path = "examples/example_tools.rs"
+
+[[example]]
+name = "full_workflow"
+path = "examples/full_workflow.rs"
+
+[[example]]
+name = "orchestration"
+path = "examples/orchestration.rs"
+
+[[example]]
+name = "quick_test"
+path = "examples/quick_test.rs"
+
+[[example]]
+name = "r2_demo"
+path = "examples/r2_demo.rs"
+
+[[example]]
+name = "simple"
+path = "examples/simple.rs"
+
+[[example]]
+name = "test_all_features"
+path = "examples/test_all_features.rs"
+
+[[example]]
+name = "traffic_branch_and_lsp"
+path = "examples/traffic_branch_and_lsp.rs"
+
+[[example]]
+name = "web_ui"
+path = "examples/web_ui.rs"
+
+[dependencies]
+# Core async runtime
+tokio = { version = "1.48.0", features = ["full"] }
+
+# CRDT engines
+automerge = "1.0.0-beta.3"
+yrs = "0.21.3"
+
+# Version control
+git2 = "0.19.0"
+
+# Storage
+rusqlite = { version = "0.36.0", features = ["bundled"] }
+bincode = "1.3.3"
+lz4 = "1.28.0"
+
+# Fast data structures
+ahash = "0.8.12"
+dashmap = "6.1.0"
+parking_lot = "0.12.5"
+bytes = "1.10.1"
+
+# File watching
+notify = { version = "8.2.0", features = ["serde"] }
+notify-debouncer-full = "0.6.0"
+
+# Utilities
+uuid = { version = "1.11.0", features = ["v4", "serde"] }
+anyhow = "1.0.100"
+chrono = { version = "0.4.42", features = ["serde"] }
+once_cell = "1.21.3"
+crossbeam = "0.8.4"
+rayon = "1.11.0"
+
+# CLI
+clap = { version = "4.5.50", features = ["derive"] }
+colored = "3.0.0"
+
+# Serialization
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.145"
+serde_cbor = "0.11.2"
+toml = "0.8"
+
+# Text processing
+ropey = "1.6.1"
+similar = { version = "2.7.0", features = ["inline"] }
+memchr = "2.7"
+regex = "1.11"
+
+# HTTP client for initial sync fetches
+reqwest = { version = "0.12.8", default-features = false, features = [
+    "json",
+    "rustls-tls",
+] }
+
+# Tree-sitter for code analysis
+tree-sitter = "0.24.7"
+tree-sitter-rust = "0.24.0"
+
+# Directory walking
+jwalk = "0.8.1"
+walkdir = "2.5.0"
+ignore = "0.4.24"
+
+# Networking (for future sync)
+axum = { version = "0.8.1", features = ["ws"] }
+tower = { version = "0.5.2", features = ["full"] }
+tower-http = { version = "0.6.2", features = ["full"] }
+
+# WebSocket client
+tokio-tungstenite = "0.28.0"
+futures = "0.3.31"
+url = "2.5.4"
+
+# Performance
+memmap2 = "0.9.9"
+num_cpus = "1.16.0"
+
+# Hashing
+sha2 = "0.10.9"
+
+# Username
+whoami = "1.5.2"
+windows-sys = { version = "0.59.0", features = ["Win32_Storage_FileSystem"] }
+dirs = "5.0.1"
+
+# Logging
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+tracing-appender = "0.2"
+tracing = "0.1"
+
+# R2 Storage & API
+base64 = "0.22.1"
+hex = "0.4.3"
+hmac = "0.12.1"
+dotenvy = "0.15.7"
+
+# Web UI
+zip = "2.2.2"
+md5 = "0.7.0"
+
+[dev-dependencies]
+tempfile = "3.10.1"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.release.build-override]
+opt-level = 3
